@@ -1,110 +1,144 @@
 const handleResponse = async (response) => {
-    const content = document.querySelector('#content');
+  const content = document.querySelector('#content');
 
-    switch (response.status) {
-      case 200:
-        content.innerHTML = `<b>Success</b>`;
-        break;
-      case 201:
-        content.innerHTML = `<b>Created</b>`;
-        break;
-      case 204:
-        content.innerHTML = `<b>Updated (No Content)</b>`;
-        break;
-      case 400:
-        content.innerHTML = `<b>Bad Request</b>`;
-        break;
-      case 404:
-        content.innerHTML = `<b>Not Found</b>`;
-        break;
-      default:
-        content.innerHTML = `Error code not implemented by client.`;
-        break;
-    }
+  switch (response.status) {
+    case 200:
+      content.innerHTML = `<b>Success</b>`;
+      break;
+    case 201:
+      content.innerHTML = `<b>Created</b>`;
+      break;
+    case 204:
+      content.innerHTML = `<b>Updated (No Content)</b>`;
+      break;
+    case 400:
+      content.innerHTML = `<b>Bad Request</b>`;
+      break;
+    case 404:
+      content.innerHTML = `<b>Not Found</b>`;
+      break;
+    default:
+      content.innerHTML = `Error code not implemented by client.`;
+      break;
+  }
 
-    let obj = await response.json();
+  let obj = await response.json();
 
-    if (obj.message) {
-      let jsonString = JSON.stringify(obj.message);
-      jsonString = jsonString.replace(/['"]+/g, '');
-      content.innerHTML += `<p>Message: ${jsonString}</p>`;
-    }
-    else {
-      let jsonString = JSON.stringify(obj);
-      content.innerHTML += `<p>${jsonString}</p>`;
-    }
+  if (obj.message) {
+    let jsonString = JSON.stringify(obj.message);
+    jsonString = jsonString.replace(/['"]+/g, '');
+    content.innerHTML += `<p>Message: ${jsonString}</p>`;
+  }
+  else {
+    let jsonString = JSON.stringify(obj);
+    content.innerHTML += `<p>${jsonString}</p>`;
+  }
 
-  };
+};
 
-  const sendPost = async (nameForm) => {
-    const nameAction = nameForm.getAttribute('action');
-    const nameMethod = nameForm.getAttribute('method');
+const sendPost = async (searchForm) => {
+  const searchAction = searchForm.getAttribute('action');
+  const searchMethod = searchForm.getAttribute('method');
 
-    const nameField = nameForm.querySelector('#nameField');
-    const ageField = nameForm.querySelector('#ageField');
+  const formData = `name=${searchForm.value}`;
 
-    const formData = `name=${nameField.value}&age=${ageField.value}`;
+  let response = await fetch(searchAction, {
+    method: searchMethod,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'application/json',
+    },
+    body: formData,
+  });
 
-    let response = await fetch(nameAction, {
-      method: nameMethod,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json',
-      },
-      body: formData,
-    });
+  handleResponse(response);
+};
 
-    handleResponse(response);
-  };
+const requestUpdate = async (userForm) => {
+  const url = userForm.querySelector('#urlField').value;
+  const method = userForm.querySelector('#methodSelect').value;
 
-  const requestUpdate = async (userForm) => {
-    const url = userForm.querySelector('#urlField').value;
-    const method = userForm.querySelector('#methodSelect').value;
+  let response = await fetch(url, {
+    method,
+    headers: {
+      'Accept': 'application/json'
+    },
+  });
 
-    let response = await fetch(url, {
-      method,
-      headers: {
-        'Accept': 'application/json'
-      },
-    });
+  handleResponse(response);
+};
 
-    handleResponse(response);
-  };
+const init = () => {
+  const marvelURL = "https://gateway.marvel.com:443/v1/public/"
+  const publicKey = '3d064ffe33b8e2b0c086c74a3b6181e7';
+  const select = document.querySelector("#characterSelect");
+  const ts = '1696798502523';
+  const hash = '96a9e4a23329c23b0d63a3b54637dce4';
 
-  const init = () => {
-    const marvelURL = "https://gateway.marvel.com:443/v1/public/"
-    const publicKey = '3d064ffe33b8e2b0c086c74a3b6181e7';
-    const select = document.querySelector("#characterSelect");
-    const ts = '1696798502523';
-    console.log(ts);
-    const hash = '96a9e4a23329c23b0d63a3b54637dce4';
+  const searchForm = document.querySelector("#searchForm");
+  const searchButton = document.querySelector("#searchButton");
+  const showContainer = document.querySelector("#show-container");
+  const listContainer = document.querySelector(".list");
 
-    const getData = async () => {
-      const response = await fetch(`${marvelURL}characters?ts=${ts}&apikey=${publicKey}&hash=${hash}`);
-      console.log(response);
-      const data = await response.json();
-      return data;
-    };
+  const removeElements = () => {
+    listContainer.innerHTML = "";
+  }
 
-    const displayOptions = async () => {
-      const options = await getData();
-      options.data['results'].forEach(result => {
-        const newOption = document.createElement("option");
-          console.log(result);
-          newOption.value = result.name;
-          newOption.text = result.name;
-          select.appendChild(newOption);
-      });
-    };
+  const displayWords = (value) => {
+    searchForm.value = value;
+    removeElements();
+  }
 
-    const addUsers = (e) => {
-      e.preventDefault();
-      sendPost(nameForm);
+  const displayOptions = async () => {
+    removeElements();
+
+    if (searchForm.value.length < 4) {
       return false;
     }
 
-    displayOptions();
+    const url = `${marvelURL}characters?ts=${ts}&apikey=${publicKey}&hash=${hash}&nameStartsWith=${searchForm.value}`;
 
+    const response = await fetch(url);
+    const jsonData = await response.json();
+
+    jsonData.data["results"].forEach((result) => {
+      let name = result.name;
+      let div = document.createElement("div");
+      div.style.cursor = "pointer";
+      div.classList.add("autocomplete-items");
+      div.addEventListener("click", () => { displayWords(name) });
+      let word = "<b>" + name.substr(0, searchForm.value.length) + "</b>";
+      word += name.substr(searchForm.value.length);
+      div.innerHTML = `<p class="item">${word}</p>`;
+      listContainer.appendChild(div);
+    })
+  }
+
+  const searchCharacter = async (e) => {
+    if (searchForm.value.trim().length < 1) {
+      alert("Input cannot be blank");
+    }
+
+    showContainer.innerHTML = "";
+    const url = `${marvelURL}characters?ts=${ts}&apikey=${publicKey}&hash=${hash}&name=${searchForm.value}`;
+
+    const response = await fetch(url);
+    const jsonData = await response.json();
+    jsonData.data["results"].forEach((element) => {
+      showContainer.innerHTML = `
+      <div class="card-container">
+        <div class="container-character-image">
+          <img src="${element.thumbnail["path"] + "." + element.thumbnail["extension"]}" />
+        </div>
+        <div class="character-name">${element.name}</div>
+        <div class="character-description">${element.description}</div>
+      </div>`;
+    });
   };
 
-  window.onload = init;
+  searchForm.addEventListener("keyup", displayOptions);
+  searchButton.addEventListener("click", searchCharacter);
+
+};
+
+window.onload = init;

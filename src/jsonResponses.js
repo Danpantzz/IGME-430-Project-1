@@ -19,13 +19,13 @@ const respondJSONMeta = (request, response, status) => {
   response.end();
 };
 
-const addUser = (request, response, body) => {
+const searchCharacter = (request, response, body) => {
   const responseJSON = {
-    message: 'Name and age are both required.',
+    message: 'query required.',
   };
 
   if (!body.name || !body.age) {
-    responseJSON.id = 'addUserMissingParams';
+    responseJSON.id = 'searchCharacterMissingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
 
@@ -73,7 +73,7 @@ const notFoundMeta = (request, response) => {
 };
 
 module.exports = {
-  addUser,
+  searchCharacter,
   getUsers,
   getUsersMeta,
   notFound,
