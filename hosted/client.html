@@ -9,15 +9,19 @@
 </head>
 
 <body>
-  <section id="top">
-    <h3>Pick Your Favorite Marvel Characters!</h3>
-    <input type="text" class="input" id="searchForm" value="iron man" action="/searchCharacter" method="post" />
-    <input type="submit" id="searchButton" value="Search" />
-    <div class="list"></div>
-    <div class="display-container" id="show-container"></div>
-  </section>
-  <section id="content">
-  </section>
+  <div id="page">
+    <section id="top">
+      <h1>Pick Your Favorite Marvel Characters!</h1>
+      <input type="submit" id="allButton" value="Show All" />
+      <input type="text" class="input" id="searchForm" value="iron man" action="/searchCharacter" method="post" />
+      <input type="submit" id="searchButton" value="Search" />
+      <div class="list"></div>
+    </section>
+    <section id="content">
+      <div class="display-container" id="show-container"></div>
+    </section>
+    <footer></footer>
+  </div>
 </body>
 
 </html>

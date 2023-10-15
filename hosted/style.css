@@ -1,9 +1,11 @@
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
 }
+
 
 #top {
   text-align: center;
@@ -15,7 +17,56 @@ html, body {
 }
 
 #content {
-  margin-top: 100px;
-  font-size: 2em;
+  margin-top: 50px;
+  font-size: 1.5em;
   text-align: center;
+}
+
+.display-container {
+  background-color: blue;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+}
+
+.card-container {
+  background-color: red;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1em;
+  padding: .5em;
+}
+
+.container-character-image {
+  background-color: #000000;
+  padding: 0.5em;
+  height: 9.37em;
+  width: 9.37em;
+  display: block;
+  margin: auto;
+  border-radius: 50%;
+}
+
+.container-character-image img {
+  width: 100%;
+  position: relative;
+  width: block;
+  border-radius: 50%;
+}
+
+.character-name {
+  padding: 0.5em 0 0.8em 0;
+  text-align: center;
+  color: #000000;
+  text-transform: uppercase;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.character-description {
+  background-color: purple;
+  text-align: center;
+
 }

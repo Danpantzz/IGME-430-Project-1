@@ -77,8 +77,11 @@ const init = () => {
 
   const searchForm = document.querySelector("#searchForm");
   const searchButton = document.querySelector("#searchButton");
+  const allButton = document.querySelector("#allButton");
   const showContainer = document.querySelector("#show-container");
   const listContainer = document.querySelector(".list");
+
+  let offset = 0;
 
   const removeElements = () => {
     listContainer.innerHTML = "";
@@ -136,8 +139,34 @@ const init = () => {
     });
   };
 
+  const showAll = async (e) => {
+    const url = `${marvelURL}characters?limit=100&offset=${offset}&ts=${ts}&apikey=${publicKey}&hash=${hash}`;
+    
+    // remove all elements present when button is pressed again
+    let child = showContainer.firstElementChild;
+    while (child) {
+      showContainer.removeChild(child);
+      child = showContainer.firstElementChild;
+    }
+
+    const response = await fetch(url);
+    const jsonData = await response.json();
+    jsonData.data["results"].forEach((element) => {
+      const div = document.createElement("div");
+      div.innerHTML = `
+      <div class="card-container">
+        <div class="container-character-image">
+          <img src="${element.thumbnail["path"] + "." + element.thumbnail["extension"]}" />
+        </div>
+        <div class="character-name">${element.name}</div>
+      </div>`;
+      showContainer.appendChild(div);
+    });
+  };
+
   searchForm.addEventListener("keyup", displayOptions);
   searchButton.addEventListener("click", searchCharacter);
+  allButton.addEventListener("click", showAll);
 
 };
 
