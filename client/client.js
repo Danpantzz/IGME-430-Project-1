@@ -1,38 +1,68 @@
 const handleResponse = async (response) => {
-  const content = document.querySelector('#content');
+  const showContainer = document.querySelector('#show-container');
+  const marvelURL = "https://gateway.marvel.com:443/v1/public/"
+  const publicKey = '3d064ffe33b8e2b0c086c74a3b6181e7';
+  const ts = '1696798502523';
+  const hash = '96a9e4a23329c23b0d63a3b54637dce4';
 
   switch (response.status) {
     case 200:
-      content.innerHTML = `<b>Success</b>`;
+      console.log(`Success: ${response.status}`);
       break;
     case 201:
-      content.innerHTML = `<b>Created</b>`;
+      showContainer.innerHTML = `<b>Favorited!</b>`;
       break;
     case 204:
-      content.innerHTML = `<b>Updated (No Content)</b>`;
+      showContainer.innerHTML = `<b>Favorited!</b>`;
       break;
     case 400:
-      content.innerHTML = `<b>Bad Request</b>`;
+      showContainer.innerHTML = `<b>Bad Request</b>`;
       break;
     case 404:
-      content.innerHTML = `<b>Not Found</b>`;
+      showContainer.innerHTML = `<b>Not Found</b>`;
       break;
     default:
-      content.innerHTML = `Error code not implemented by client.`;
+      showContainer.innerHTML = `Error code not implemented by client.`;
       break;
   }
 
   let obj = await response.json();
 
-  if (obj.message) {
-    let jsonString = JSON.stringify(obj.message);
-    jsonString = jsonString.replace(/['"]+/g, '');
-    content.innerHTML += `<p>Message: ${jsonString}</p>`;
-  }
-  else {
-    let jsonString = JSON.stringify(obj);
-    content.innerHTML += `<p>${jsonString}</p>`;
-  }
+  showContainer.innerHTML = "";
+
+  obj.users[`${username.value}`].forEach(async (item) => {
+    const url = `${marvelURL}characters?ts=${ts}&apikey=${publicKey}&hash=${hash}&name=${item.character}`;
+
+    const response = await fetch(url);
+    const jsonData = await response.json();
+    jsonData.data["results"].forEach((element) => {
+      const div = document.createElement("div");
+      div.innerHTML = `
+      <div class="card-container">
+        <div class="container-character-image">
+          <img src="${element.thumbnail["path"] + "." + element.thumbnail["extension"]}" />
+        </div>
+        <div class="character-name">${element.name}</div>
+        <div class="character-description">${element.description}</div>
+      </div>`;
+      if (!element.description) {
+        div.innerHTML = `
+      <div class="card-container">
+        <div class="container-character-image">
+          <img src="${element.thumbnail["path"] + "." + element.thumbnail["extension"]}" />
+        </div>
+        <div class="character-name">${element.name}</div>
+        <div class="character-description">No Description Provided.</div>
+      </div>`;
+
+      }
+      showContainer.appendChild(div);
+    });
+  })
+
+  //let jsonString = JSON.stringify(obj);
+  //showContainer.innerHTML += `<p>${jsonString}</p>`;
+
 
 };
 
@@ -40,7 +70,7 @@ const sendPost = async (searchForm) => {
   const searchAction = searchForm.getAttribute('action');
   const searchMethod = searchForm.getAttribute('method');
 
-  const formData = `name=${searchForm.value}`;
+  const formData = `username=${username.value}&character=${searchForm.value}`;
 
   let response = await fetch(searchAction, {
     method: searchMethod,
@@ -54,11 +84,11 @@ const sendPost = async (searchForm) => {
   handleResponse(response);
 };
 
-const requestUpdate = async (userForm) => {
-  const url = userForm.querySelector('#urlField').value;
-  const method = userForm.querySelector('#methodSelect').value;
+const requestUpdate = async (button) => {
+  const searchAction = button.getAttribute('action');
+  const method = button.getAttribute('method');
 
-  let response = await fetch(url, {
+  let response = await fetch(searchAction, {
     method,
     headers: {
       'Accept': 'application/json'
@@ -68,10 +98,19 @@ const requestUpdate = async (userForm) => {
   handleResponse(response);
 };
 
+const removeFavorite = (name) => {
+  name.value = searchForm.value;
+  sendPost(name);
+}
+
+const favorite = (name) => {
+  console.log(`favorite: ${name}`);
+  sendPost(name);
+}
+
 const init = () => {
   const marvelURL = "https://gateway.marvel.com:443/v1/public/"
   const publicKey = '3d064ffe33b8e2b0c086c74a3b6181e7';
-  const select = document.querySelector("#characterSelect");
   const ts = '1696798502523';
   const hash = '96a9e4a23329c23b0d63a3b54637dce4';
 
@@ -80,8 +119,12 @@ const init = () => {
   const allButton = document.querySelector("#allButton");
   const showContainer = document.querySelector("#show-container");
   const listContainer = document.querySelector(".list");
+  const favoritesButton = document.querySelector("#favoritesButton");
+  const username = document.querySelector("#username");
 
   let offset = 0;
+
+
 
   const removeElements = () => {
     listContainer.innerHTML = "";
@@ -135,13 +178,20 @@ const init = () => {
         </div>
         <div class="character-name">${element.name}</div>
         <div class="character-description">${element.description}</div>
+        <div class="character-buttons">
+          <button class="favorite-button" id="remove-favorite" action="/removeCharacter" method="post">Remove</button>
+          <button class="favorite-button" id="favorite">Favorite</button>
+        </div>
       </div>`;
+      document.querySelector("#favorite").addEventListener("click", () => { favorite(searchForm); });
+      document.querySelector("#remove-favorite").addEventListener("click", () => { removeFavorite(document.querySelector("#remove-favorite")); });
+
     });
   };
 
   const showAll = async (e) => {
     const url = `${marvelURL}characters?limit=100&offset=${offset}&ts=${ts}&apikey=${publicKey}&hash=${hash}`;
-    
+
     // remove all elements present when button is pressed again
     let child = showContainer.firstElementChild;
     while (child) {
@@ -159,7 +209,22 @@ const init = () => {
           <img src="${element.thumbnail["path"] + "." + element.thumbnail["extension"]}" />
         </div>
         <div class="character-name">${element.name}</div>
+        <div class="character-description">${element.description}</div>
       </div>`;
+      if (!element.description) {
+        div.innerHTML = `
+      <div class="card-container">
+        <div class="container-character-image">
+          <img src="${element.thumbnail["path"] + "." + element.thumbnail["extension"]}" />
+        </div>
+        <div class="character-name">${element.name}</div>
+        <div class="character-description">No Description Provided.</div>
+      </div>`;
+      }
+      div.addEventListener("click", () => {
+        searchForm.value = element.name;
+        searchCharacter();
+      });
       showContainer.appendChild(div);
     });
   };
@@ -167,7 +232,9 @@ const init = () => {
   searchForm.addEventListener("keyup", displayOptions);
   searchButton.addEventListener("click", searchCharacter);
   allButton.addEventListener("click", showAll);
-
+  favoritesButton.addEventListener("click", (e) => {
+    requestUpdate(favoritesButton);
+  });
 };
 
 window.onload = init;

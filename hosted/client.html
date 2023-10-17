@@ -12,9 +12,12 @@
   <div id="page">
     <section id="top">
       <h1>Pick Your Favorite Marvel Characters!</h1>
+      <label>Username:</label>
+      <input type="text" id="username" value="Default"/>
       <input type="submit" id="allButton" value="Show All" />
-      <input type="text" class="input" id="searchForm" value="iron man" action="/searchCharacter" method="post" />
+      <input type="text" class="input" id="searchForm" value="iron man" action="/favoriteCharacter" method="post" />
       <input type="submit" id="searchButton" value="Search" />
+      <input type="submit" id="favoritesButton" value="Show Favorites" action="/getFavorites" method="get" />
       <div class="list"></div>
     </section>
     <section id="content">

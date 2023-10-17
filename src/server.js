@@ -29,8 +29,11 @@ const parseBody = (request, response, handler) => {
 
 // handle POST requests
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/searchCharacter') {
-    parseBody(request, response, jsonHandler.searchCharacter);
+  if (parsedUrl.pathname === '/favoriteCharacter') {
+    parseBody(request, response, jsonHandler.favoriteCharacter);
+  }
+  else if (parsedUrl.pathname === '/removeCharacter') {
+    parseBody(request, response, jsonHandler.removeCharacter);
   }
 };
 
@@ -42,8 +45,8 @@ const handleGet = (request, response, parsedUrl) => {
     htmlHandler.getCSS(request, response);
   } else if (parsedUrl.pathname === '/bundle.js') {
     htmlHandler.getBundle(request, response);
-  } else if (parsedUrl.pathname === '/getUsers') {
-    jsonHandler.getUsers(request, response);
+  } else if (parsedUrl.pathname === '/getFavorites') {
+    jsonHandler.getFavorites(request, response);
   } else if (parsedUrl.pathname === '/notReal') {
     jsonHandler.notFound(request, response);
   } else {
@@ -52,8 +55,8 @@ const handleGet = (request, response, parsedUrl) => {
 };
 
 const handleHead = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/getUsers') {
-    jsonHandler.getUsersMeta(request, response);
+  if (parsedUrl.pathname === '/getFavorites') {
+    jsonHandler.getFavoritesMeta(request, response);
   } else if (parsedUrl.pathname === '/notReal') {
     jsonHandler.notFoundMeta(request, response);
   } else {

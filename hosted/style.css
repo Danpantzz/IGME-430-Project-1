@@ -23,11 +23,11 @@ body {
 }
 
 .display-container {
-  background-color: blue;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-
+  align-items: center;
+  justify-content: center;
 }
 
 .card-container {
@@ -37,23 +37,28 @@ body {
   align-items: center;
   margin: 1em;
   padding: .5em;
+  border-radius: 10%;
 }
 
 .container-character-image {
   background-color: #000000;
   padding: 0.5em;
-  height: 9.37em;
-  width: 9.37em;
-  display: block;
+  height: 20em;
+  width: 20em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: auto;
-  border-radius: 50%;
+  border-radius: 20%;
+  overflow: hidden;
 }
 
 .container-character-image img {
-  width: 100%;
+  max-width: 100%;
+  object-fit: cover;
   position: relative;
   width: block;
-  border-radius: 50%;
+  border-radius: 20%;
 }
 
 .character-name {
@@ -67,6 +72,9 @@ body {
 
 .character-description {
   background-color: purple;
+  margin-bottom: .5em;
+  overflow-y: scroll;
   text-align: center;
-
+  height: 5em;
+  width: 20em;
 }
