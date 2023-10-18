@@ -4,7 +4,11 @@
 <head>
   <title>Our simple HTTP server</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Aboreto&family=Bentham&family=Comic+Neue:wght@300;400&display=swap"
+    rel="stylesheet">
   <script src="/bundle.js"></script>
 </head>
 
@@ -12,13 +16,18 @@
   <div id="page">
     <section id="top">
       <h1>Pick Your Favorite Marvel Characters!</h1>
+      <p>Click a card in Show All to see favorite options, or Search directly!</p>
       <label>Username:</label>
-      <input type="text" id="username" value="Default"/>
+      <input type="text" id="username" value="Default" />
       <input type="submit" id="allButton" value="Show All" />
-      <input type="text" class="input" id="searchForm" value="iron man" action="/favoriteCharacter" method="post" />
+      <div id="searchMenu">
+        <input type="text" class="input" id="searchForm" value="iron man" action="/favoriteCharacter" method="post" />
+        <div class="list"></div>
+      </div>
+
       <input type="submit" id="searchButton" value="Search" />
       <input type="submit" id="favoritesButton" value="Show Favorites" action="/getFavorites" method="get" />
-      <div class="list"></div>
+
     </section>
     <section id="content">
       <div class="display-container" id="show-container"></div>

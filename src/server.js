@@ -31,8 +31,7 @@ const parseBody = (request, response, handler) => {
 const handlePost = (request, response, parsedUrl) => {
   if (parsedUrl.pathname === '/favoriteCharacter') {
     parseBody(request, response, jsonHandler.favoriteCharacter);
-  }
-  else if (parsedUrl.pathname === '/removeCharacter') {
+  } else if (parsedUrl.pathname === '/removeCharacter') {
     parseBody(request, response, jsonHandler.removeCharacter);
   }
 };
@@ -46,7 +45,7 @@ const handleGet = (request, response, parsedUrl) => {
   } else if (parsedUrl.pathname === '/bundle.js') {
     htmlHandler.getBundle(request, response);
   } else if (parsedUrl.pathname === '/getFavorites') {
-    jsonHandler.getFavorites(request, response);
+    jsonHandler.getFavorites(request, response, parsedUrl);
   } else if (parsedUrl.pathname === '/notReal') {
     jsonHandler.notFound(request, response);
   } else {
@@ -65,12 +64,8 @@ const handleHead = (request, response, parsedUrl) => {
 };
 
 const onRequest = (request, response) => {
-  // parse url into individual parts
-  // returns an object of url parts by name
   const parsedUrl = url.parse(request.url);
 
-  // check if method was POST, otherwise assume GET
-  // for the sake of this example
   if (request.method === 'POST') {
     handlePost(request, response, parsedUrl);
   } else if (request.method === 'GET') {

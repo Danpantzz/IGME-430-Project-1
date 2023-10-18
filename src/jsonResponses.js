@@ -19,33 +19,37 @@ const respondJSONMeta = (request, response, status) => {
   response.end();
 };
 
+// Fired when Remove button is clicked on Character card
 const removeCharacter = (request, response, body) => {
   const responseJSON = {
-    message: 'Character not found in user object',
+    message: 'Character not found in Favorites.',
   };
 
-  let responseCode = 200;
+  const responseCode = 200;
 
+  // if username is not in users, then user has not favorited anything yet
   if (!users[body.username]) {
     return respondJSON(request, response, responseCode, responseJSON);
   }
 
+  // iterate through username array for specified character and remove it
   let i = 0;
   users[body.username].forEach((c) => {
     if (c.character === body.character) {
       users[body.username].splice(i, 1);
-      responseJSON.message = 'Character Deleted.';
+      responseJSON.message = 'Character Removed.';
       return;
     }
     i++;
   });
 
   return respondJSON(request, response, responseCode, responseJSON);
-}
+};
 
+// Fires when Favorite button is clicked on Character card
 const favoriteCharacter = (request, response, body) => {
   const responseJSON = {
-    message: 'query required.',
+    message: 'username and character required.',
   };
 
   if (!body.username || !body.character) {
@@ -55,38 +59,49 @@ const favoriteCharacter = (request, response, body) => {
 
   let responseCode = 204;
 
+  // if username is not present in users, then make new user with username
   if (!users[body.username]) {
     responseCode = 201;
     users[body.username] = [];
   }
 
+  // meant to prevent user from favoriting the same character twice, doesn't work
   let favorited = false;
-
   users[body.username].forEach((c) => {
     if (c.character === body.character) {
       responseJSON.message = 'Character already favorited';
       favorited = true;
-      return;
     }
-  })
+  });
   if (favorited) {
     respondJSON(request, response, responseCode, responseJSON);
   }
 
-  users[body.username].push({ "character": body.character });
-
-  // if (responseCode === 201) {
-  //   responseJSON.message = 'Created Successfully';
-  //   return respondJSON(request, response, responseCode, responseJSON);
-  // }
+  // add character to the username's object array
+  users[body.username].push({ character: body.character });
 
   return respondJSONMeta(request, response, responseCode);
 };
 
+// Fired when Show Favorited button is clicked
 const getFavorites = (request, response) => {
   const responseJSON = {
     users,
   };
+
+  // Attempted to use the parsedUrl for query parameters to get data, didn't work
+
+  // if (!body.username) {
+  //   responseJSON.id = "MissingUsernameParams";
+  //   return respondJSON(request,response, 400, responseJSON);
+  // }
+
+  // if (!users[body.username]) {
+  //   responseJSON.id = "UsernameNotFound";
+  //   return respondJSON(request, response, 400, responseJSON);
+  // }
+
+  // responseJSON = users[body.username];
 
   return respondJSON(request, response, 200, responseJSON);
 };
